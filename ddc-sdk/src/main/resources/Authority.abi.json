@@ -1,0 +1,376 @@
+{
+	"ABI version": 2,
+	"version": "2.2",
+	"header": ["pubkey", "time", "expire"],
+	"functions": [
+		{
+			"name": "constructor",
+			"inputs": [
+				{"name":"codeAccount","type":"cell"},
+				{"name":"ownerPubkey","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "addOperator",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"accountName","type":"string"},
+				{"name":"accountDID","type":"string"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "addAccountByOperator",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"accountName","type":"string"},
+				{"name":"accountDID","type":"string"},
+				{"name":"leaderDID","type":"string"},
+				{"name":"addPlatform","type":"bool"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "addAccountByPlatform",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"accountName","type":"string"},
+				{"name":"accountDID","type":"string"},
+				{"name":"leaderDID","type":"string"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "addBatchAccountByOperator",
+			"inputs": [
+				{"name":"accounts","type":"address[]"},
+				{"name":"accountNames","type":"string[]"},
+				{"name":"accountDIDs","type":"string[]"},
+				{"name":"leaderDIDs","type":"string[]"},
+				{"name":"addPlatform","type":"bool"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "addBatchAccountByPlatform",
+			"inputs": [
+				{"name":"accounts","type":"address[]"},
+				{"name":"accountNames","type":"string[]"},
+				{"name":"accountDIDs","type":"string[]"},
+				{"name":"leaderDID","type":"string"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setSwitcherStateOfPlatform",
+			"inputs": [
+				{"name":"isOpen","type":"bool"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "switcherStateOfPlatform",
+			"inputs": [
+			],
+			"outputs": [
+				{"name":"value0","type":"bool"}
+			]
+		},
+		{
+			"name": "getAccountAddress",
+			"inputs": [
+				{"name":"account","type":"address"}
+			],
+			"outputs": [
+				{"name":"value0","type":"address"}
+			]
+		},
+		{
+			"name": "delAccount",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "updateAccountState",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"state","type":"uint8"},
+				{"name":"changePlatformState","type":"bool"},
+				{"name":"senderRole","type":"uint8"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "withdrawGas",
+			"inputs": [
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "withdrawAccountGas",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"gasTo","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "rechargeEvent",
+			"inputs": [
+				{"name":"from","type":"address"},
+				{"name":"to","type":"address"},
+				{"name":"amount","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "rechargeBatchEvent",
+			"inputs": [
+				{"name":"from","type":"address"},
+				{"name":"toList","type":"address[]"},
+				{"name":"amounts","type":"uint256[]"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "payEvent",
+			"inputs": [
+				{"name":"payer","type":"address"},
+				{"name":"payee","type":"address"},
+				{"name":"sig","type":"uint32"},
+				{"name":"amount","type":"uint32"},
+				{"name":"ddcId","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "settlementEvent",
+			"inputs": [
+				{"name":"accAddr","type":"address"},
+				{"name":"ddcAddr","type":"address"},
+				{"name":"amount","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "approvalForAllEvent",
+			"inputs": [
+				{"name":"owner","type":"address"},
+				{"name":"operator","type":"address"},
+				{"name":"approved","type":"bool"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "addAccountEvent",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"account","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "addBatchAccountEvent",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"accounts","type":"address[]"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "setSwitcherStateOfPlatformEvent",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"isOpen","type":"bool"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "updateAccountStateEvent",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"platformState","type":"uint8"},
+				{"name":"operatorState","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "delAccountEvent",
+			"inputs": [
+				{"name":"account","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "owner",
+			"inputs": [
+				{"name":"answerId","type":"uint32"}
+			],
+			"outputs": [
+				{"name":"pubkey","type":"uint256"}
+			]
+		},
+		{
+			"name": "transferOwnership",
+			"inputs": [
+				{"name":"newOwner","type":"uint256"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"data": [
+	],
+	"events": [
+		{
+			"name": "Recharge",
+			"inputs": [
+				{"name":"from","type":"address"},
+				{"name":"to","type":"address"},
+				{"name":"amount","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "RechargeBatch",
+			"inputs": [
+				{"name":"from","type":"address"},
+				{"name":"toList","type":"address[]"},
+				{"name":"amounts","type":"uint256[]"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "Pay",
+			"inputs": [
+				{"name":"payer","type":"address"},
+				{"name":"payee","type":"address"},
+				{"name":"sig","type":"uint32"},
+				{"name":"amount","type":"uint32"},
+				{"name":"ddcId","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "Settlement",
+			"inputs": [
+				{"name":"accAddr","type":"address"},
+				{"name":"ddcAddr","type":"address"},
+				{"name":"amount","type":"uint256"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "ApprovalForAll",
+			"inputs": [
+				{"name":"owner","type":"address"},
+				{"name":"operator","type":"address"},
+				{"name":"approved","type":"bool"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AddAccount",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"account","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "AddBatchAccount",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"accounts","type":"address[]"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "SetSwitcherStateOfPlatform",
+			"inputs": [
+				{"name":"operator","type":"address"},
+				{"name":"isOpen","type":"bool"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "UpdateAccountState",
+			"inputs": [
+				{"name":"account","type":"address"},
+				{"name":"platformState","type":"uint8"},
+				{"name":"operatorState","type":"uint8"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "DelAccount",
+			"inputs": [
+				{"name":"account","type":"address"}
+			],
+			"outputs": [
+			]
+		},
+		{
+			"name": "OwnershipTransferred",
+			"inputs": [
+				{"name":"oldOwner","type":"uint256"},
+				{"name":"newOwner","type":"uint256"}
+			],
+			"outputs": [
+			]
+		}
+	],
+	"fields": [
+		{"name":"_pubkey","type":"uint256"},
+		{"name":"_timestamp","type":"uint64"},
+		{"name":"_constructorFlag","type":"bool"},
+		{"name":"_owner","type":"uint256"},
+		{"name":"_executeFee","type":"uint128"},
+		{"name":"_codeAccount","type":"cell"},
+		{"name":"_platformSwitcher","type":"bool"}
+	]
+}

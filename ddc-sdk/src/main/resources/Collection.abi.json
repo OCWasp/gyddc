@@ -1,0 +1,526 @@
+{
+  "ABI version": 2,
+  "version": "2.2",
+  "header": ["pubkey", "time", "expire"],
+  "functions": [
+    {
+      "name": "constructor",
+      "inputs": [
+        {"name":"codeNft","type":"cell"},
+        {"name":"codeIndex","type":"cell"},
+        {"name":"codeIndexBasis","type":"cell"},
+        {"name":"ownerPubkey","type":"uint256"},
+        {"name":"json","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "mint",
+      "inputs": [
+        {"name":"sender","type":"address"},
+        {"name":"owner","type":"address"},
+        {"name":"json","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "mintNft",
+      "inputs": [
+        {"name":"owner","type":"address"},
+        {"name":"json","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "onTokenBurned",
+      "inputs": [
+        {"name":"id","type":"uint256"},
+        {"name":"owner","type":"address"},
+        {"name":"manager","type":"address"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "withdraw",
+      "inputs": [
+        {"name":"dest","type":"address"},
+        {"name":"value","type":"uint128"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "setRemainOnNft",
+      "inputs": [
+        {"name":"remainOnNft","type":"uint128"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "deposit",
+      "inputs": [
+        {"name":"amount","type":"uint256"},
+        {"name":"gasTo","type":"address"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "settlement",
+      "inputs": [
+        {"name":"amount","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "getBalance",
+      "inputs": [
+      ],
+      "outputs": [
+        {"name":"value0","type":"uint256"}
+      ]
+    },
+    {
+      "name": "getBalanceCount",
+      "inputs": [
+      ],
+      "outputs": [
+        {"name":"value0","type":"uint256"}
+      ]
+    },
+    {
+      "name": "getLatestDDCId",
+      "inputs": [
+      ],
+      "outputs": [
+        {"name":"value0","type":"uint128"}
+      ]
+    },
+    {
+      "name": "name",
+      "inputs": [
+      ],
+      "outputs": [
+        {"name":"value0","type":"string"}
+      ]
+    },
+    {
+      "name": "symbol",
+      "inputs": [
+      ],
+      "outputs": [
+        {"name":"value0","type":"string"}
+      ]
+    },
+    {
+      "name": "setNameAndSymbol",
+      "inputs": [
+        {"name":"name","type":"string"},
+        {"name":"symbol","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "getFunctionIds",
+      "inputs": [
+        {"name":"functionName","type":"string"}
+      ],
+      "outputs": [
+        {"name":"value0","type":"uint32"}
+      ]
+    },
+    {
+      "name": "transferEvent",
+      "inputs": [
+        {"name":"operator","type":"address"},
+        {"name":"from","type":"address"},
+        {"name":"to","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "approvalEvent",
+      "inputs": [
+        {"name":"operator","type":"address"},
+        {"name":"to","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "enterBlacklistEvent",
+      "inputs": [
+        {"name":"sender","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "exitBlacklistEvent",
+      "inputs": [
+        {"name":"sender","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "setURIEvent",
+      "inputs": [
+        {"name":"operator","type":"address"},
+        {"name":"ddcId","type":"uint256"},
+        {"name":"ddcURI","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "addFunction",
+      "inputs": [
+        {"name":"role","type":"uint8"},
+        {"name":"sig","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "delFunction",
+      "inputs": [
+        {"name":"role","type":"uint8"},
+        {"name":"sig","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "getFunctions",
+      "inputs": [
+        {"name":"role","type":"uint8"}
+      ],
+      "outputs": [
+        {"name":"value0","type":"uint32[]"}
+      ]
+    },
+    {
+      "name": "hasFunctionPermission",
+      "inputs": [
+        {"name":"role","type":"uint8"},
+        {"name":"sig","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"value0","type":"bool"}
+      ]
+    },
+    {
+      "name": "queryFee",
+      "inputs": [
+        {"name":"sig","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"value0","type":"uint256"}
+      ]
+    },
+    {
+      "name": "setFee",
+      "inputs": [
+        {"name":"sig","type":"uint32"},
+        {"name":"amount","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "delFee",
+      "inputs": [
+        {"name":"sig","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "delDDC",
+      "inputs": [
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "owner",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"pubkey","type":"uint256"}
+      ]
+    },
+    {
+      "name": "transferOwnership",
+      "inputs": [
+        {"name":"newOwner","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "indexBasisCode",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"code","type":"cell"}
+      ]
+    },
+    {
+      "name": "indexBasisCodeHash",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"hash","type":"uint256"}
+      ]
+    },
+    {
+      "name": "resolveIndexBasis",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"indexBasis","type":"address"}
+      ]
+    },
+    {
+      "name": "indexCode",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"code","type":"cell"}
+      ]
+    },
+    {
+      "name": "indexCodeHash",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"hash","type":"uint256"}
+      ]
+    },
+    {
+      "name": "getJson",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"json","type":"string"}
+      ]
+    },
+    {
+      "name": "totalSupply",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"count","type":"uint128"}
+      ]
+    },
+    {
+      "name": "nftCode",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"code","type":"cell"}
+      ]
+    },
+    {
+      "name": "nftCodeHash",
+      "inputs": [
+        {"name":"answerId","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"codeHash","type":"uint256"}
+      ]
+    },
+    {
+      "name": "nftAddress",
+      "inputs": [
+        {"name":"answerId","type":"uint32"},
+        {"name":"id","type":"uint256"}
+      ],
+      "outputs": [
+        {"name":"nft","type":"address"}
+      ]
+    },
+    {
+      "name": "supportsInterface",
+      "inputs": [
+        {"name":"answerId","type":"uint32"},
+        {"name":"interfaceID","type":"uint32"}
+      ],
+      "outputs": [
+        {"name":"value0","type":"bool"}
+      ]
+    }
+  ],
+  "data": [
+  ],
+  "events": [
+    {
+      "name": "Transfer",
+      "inputs": [
+        {"name":"operator","type":"address"},
+        {"name":"from","type":"address"},
+        {"name":"to","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "Approval",
+      "inputs": [
+        {"name":"operator","type":"address"},
+        {"name":"to","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "EnterBlacklist",
+      "inputs": [
+        {"name":"sender","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "ExitBlacklist",
+      "inputs": [
+        {"name":"sender","type":"address"},
+        {"name":"ddcId","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "SetURI",
+      "inputs": [
+        {"name":"operator","type":"address"},
+        {"name":"ddcId","type":"uint256"},
+        {"name":"ddcURI","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "SetNameAndSymbol",
+      "inputs": [
+        {"name":"name","type":"string"},
+        {"name":"symbol","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "SetFee",
+      "inputs": [
+        {"name":"ddcAddr","type":"address"},
+        {"name":"sig","type":"uint32"},
+        {"name":"amount","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "DelFee",
+      "inputs": [
+        {"name":"ddcAddr","type":"address"},
+        {"name":"sig","type":"uint32"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "DelDDC",
+      "inputs": [
+        {"name":"ddcAddr","type":"address"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {"name":"oldOwner","type":"uint256"},
+        {"name":"newOwner","type":"uint256"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "NftCreated",
+      "inputs": [
+        {"name":"id","type":"uint256"},
+        {"name":"nft","type":"address"},
+        {"name":"owner","type":"address"},
+        {"name":"manager","type":"address"},
+        {"name":"creator","type":"address"},
+        {"name":"json","type":"string"}
+      ],
+      "outputs": [
+      ]
+    },
+    {
+      "name": "NftBurned",
+      "inputs": [
+        {"name":"id","type":"uint256"},
+        {"name":"nft","type":"address"},
+        {"name":"owner","type":"address"},
+        {"name":"manager","type":"address"}
+      ],
+      "outputs": [
+      ]
+    }
+  ],
+  "fields": [
+    {"name":"_pubkey","type":"uint256"},
+    {"name":"_timestamp","type":"uint64"},
+    {"name":"_constructorFlag","type":"bool"},
+    {"name":"_supportedInterfaces","type":"optional(cell)"},
+    {"name":"_codeNft","type":"cell"},
+    {"name":"_totalSupply","type":"uint128"},
+    {"name":"_json","type":"string"},
+    {"name":"_codeIndex","type":"cell"},
+    {"name":"_codeIndexBasis","type":"cell"},
+    {"name":"_indexDeployValue","type":"uint128"},
+    {"name":"_indexDestroyValue","type":"uint128"},
+    {"name":"_deployIndexBasisValue","type":"uint128"},
+    {"name":"_owner","type":"uint256"},
+    {"name":"_ddcFees","type":"map(uint32,uint32)"},
+    {"name":"_funcList","type":"optional(cell)"},
+    {"name":"_sigIndexList","type":"optional(cell)"},
+    {"name":"_balance","type":"uint256"},
+    {"name":"_balanceCount","type":"uint256"},
+    {"name":"_remainOnNft","type":"uint128"},
+    {"name":"_mintNftValue","type":"uint128"},
+    {"name":"_mintingFee","type":"uint128"},
+    {"name":"_lastTokenId","type":"uint128"},
+    {"name":"_name","type":"string"},
+    {"name":"_symbol","type":"string"},
+    {"name":"_functionIds","type":"optional(cell)"}
+  ]
+}
