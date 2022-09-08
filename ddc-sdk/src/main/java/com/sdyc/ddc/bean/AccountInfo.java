@@ -74,4 +74,17 @@ public class AccountInfo {
         this.field = field;
     }
 
+    @Override
+    public String toString() {
+        return "AccountInfo{" +
+                "account='" + account + '\'' +
+                ", accountDID='" + accountDID + '\'' +
+                ", accountName='" + accountName + '\'' +
+                ", accountRole=" + accountRole +
+                ", leaderDID='" + leaderDID + '\'' +
+                ", platformState=" + platformState +
+                ", operatorState=" + operatorState +
+                ", field='" + field + '\'' +
+                '}';
+    }
 }

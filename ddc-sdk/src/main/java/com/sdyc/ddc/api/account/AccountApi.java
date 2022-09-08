@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class AccountApi extends ApiBase {
     protected static AccountApi accountApi;
@@ -134,7 +135,7 @@ public class AccountApi extends ApiBase {
                 :DDCResponse.success(JSONObject.fromObject(callRes).getJSONObject("transaction").getString("id"));
     }
 
-    public DDCResponse switcherStateOfPlatform(){
+    public DDCResponse switcherStateOfPlatform() {
         JSONObject runRes = runGet(authority,"switcherStateOfPlatform",null,authorityAbi,null);
         return DDCResponse.success(runRes.getJSONObject("decoded").getJSONObject("output").getString("value0"));
     }
@@ -186,7 +187,7 @@ public class AccountApi extends ApiBase {
                 :DDCResponse.success(JSONObject.fromObject(callRes).getJSONObject("transaction").getString("id"));
     }
 
-    public DDCResponse addBatchAccountByOperator(String sender, List<AccountInfo> accounts, Crypto.KeyPair keyPair) throws Exception{
+    public DDCResponse addBatchAccountByOperator(String sender, List<AccountInfo> accounts, Crypto.KeyPair keyPair) {
         if(accounts.size() > 200)
             return DDCResponse.error("accounts最大长度200");
         String senderAccAds = getAccountAddress(sender);
@@ -336,7 +337,7 @@ public class AccountApi extends ApiBase {
                 :DDCResponse.success(JSONObject.fromObject(callRes).getJSONObject("transaction").getString("id"));
     }
 
-    public BigInteger balanceOf(String accAddr){
+    public BigInteger balanceOf(String accAddr) {
         String accountAddress = getAccountAddress(accAddr);
         if(accountAddress == null){
             return null;
@@ -511,10 +512,12 @@ public class AccountApi extends ApiBase {
         // 随机生产秘钥
         Crypto.KeyPair keys = KeyGenerator.getKey();
 
-        Abi.ABI abi = CommonUtils.abiFromResource("/Wallet_5a33.abi.json");
-        Abi.DeploySet deploySet = new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet_5a33.tvc"));
+        Abi.ABI abi = CommonUtils.abiFromResource("/Wallet.abi.json");
+        Abi.DeploySet deploySet = new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc"));
+        JSONObject input = new JSONObject();
+        input.put("ownerPubkey", "0x" + keys.getPublic());
         // 构造参数
-        Abi.CallSet callSet = new Abi.CallSet("constructor", null, null);
+        Abi.CallSet callSet = new Abi.CallSet("constructor", null, input);
 
         Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(abi,null, deploySet, callSet, new Abi.Signer.Keys(keys),null).get();
         String deployAddress = message.getAddress();
@@ -528,7 +531,49 @@ public class AccountApi extends ApiBase {
         return DDCResponse.success(result);
     }
 
-    public DDCResponse setTransable(String sender, String account, boolean flag, Crypto.KeyPair keyPair) throws Exception{
+    public DDCResponse wallet(String sender, Crypto.KeyPair keyPair) {
+        // 随机生产秘钥
+        Crypto.KeyPair keys = KeyGenerator.getKey();
+
+        try {
+            // 检查调用者账号格式和账号的可用性
+            String senderAccAds = getAccountAddress(sender);
+            DDCResponse checkAdsRes = checkAds2(sender, senderAccAds, "调用者");
+            if(!checkAdsRes.isSuccess())
+                return checkAdsRes;
+
+            Abi.ABI abi = CommonUtils.abiFromResource("/Wallet.abi.json");
+            Abi.DeploySet deploySet = new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc"));
+            // 构造参数
+            JSONObject json = new JSONObject();
+            json.put("ownerPubkey", "0x" + keys.getPublic());
+            json.put("codeIndex", PropertiesReader.config.getString("codeIndex"));
+            Abi.CallSet callSet = new Abi.CallSet("constructor", null, json);
+
+            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(abi,null, deploySet, callSet, new Abi.Signer.Keys(keys),null).get();
+            String deployAddress = message.getAddress();
+
+            JSONObject input = new JSONObject();
+            input.put("publickey", "0x" + keys.getPublic());
+            Random random = new Random();
+            Processing.ResultOfProcessMessage callRes =
+                    callInternalFun(sender,keyPair,gas12+gasBase,
+                            depolyWallet,
+                            "wallet",input,
+                            null,CommonUtils.abiFromResource("/DepolyWallet.abi.json"), 1);
+
+            JSONObject result = new JSONObject();
+            result.put("address", deployAddress);
+            result.put("keys", keys);
+
+            return DDCResponse.success(result);
+        } catch (Exception e){
+            e.printStackTrace();
+            return DDCResponse.error("运行异常: " + e);
+        }
+    }
+
+    public DDCResponse setTransable(String sender, String account, boolean flag, Crypto.KeyPair keyPair) {
         String senderAccAds = getAccountAddress(sender);
         DDCResponse checkAdsRes = checkAds2(sender, senderAccAds, "调用者");
         if(!checkAdsRes.isSuccess())
@@ -548,7 +593,7 @@ public class AccountApi extends ApiBase {
         JSONObject input = new JSONObject();
         input.put("ok", flag);
         Processing.ResultOfProcessMessage callRes =
-                callFun(account,"setTransable",input,setTrKeys,CommonUtils.abiFromResource("/Wallet_5a33.abi.json"));
+                callFun(account,"setTransable",input,setTrKeys,CommonUtils.abiFromResource("/Wallet.abi.json"));
         return callRes == null
                 ?DDCResponse.error("调用合约失败")
                 :DDCResponse.success(JSONObject.fromObject(callRes).getJSONObject("transaction").getString("id"));

@@ -281,7 +281,7 @@ public class NFTApi extends ApiBase{
         return res == null ? null : res.getJSONObject("decoded").getJSONObject("output").getString("value0");
     }
 
-    public String ddcURI(BigInteger ddcId) throws Exception{
+    public String ddcURI(BigInteger ddcId){
         JSONObject res = runGet(nftAddress(ddcId), "ddcURI", null, nftAbi, null);
         return res == null ? null : res.getJSONObject("decoded").getJSONObject("output").getString("value0");
     }
@@ -457,5 +457,4 @@ public class NFTApi extends ApiBase{
         JSONObject res = runGet(collection, "getFunctions", input, collectionAbi, null);
         return res==null ? null : res.getJSONObject("decoded").getJSONObject("output").getJSONArray("value0");
     }
-
 }

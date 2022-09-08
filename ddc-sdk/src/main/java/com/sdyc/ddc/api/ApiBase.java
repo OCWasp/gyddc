@@ -10,8 +10,6 @@ import net.sf.json.JSONObject;
 import org.apache.commons.collections.MapUtils;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,6 +25,7 @@ public class ApiBase {
     public static String authority = PropertiesReader.config.getString("authority");
     protected static String bsnOperator = PropertiesReader.config.getString("bsnOperator");
     public static String collection = PropertiesReader.config.getString("collection");
+    public static String depolyWallet = PropertiesReader.config.getString("depolyWallet");
     // abi
     public static Abi.ABI collectionAbi = CommonUtils.abiFromResource("/Collection.abi.json");
     public static Abi.ABI authorityAbi = CommonUtils.abiFromResource("/Authority.abi.json");
@@ -127,7 +126,7 @@ public class ApiBase {
                     new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
                     giveJsonObject.toString()
             );
-            result = processing.processMessage(CommonUtils.abiFromResource("/Wallet_5a33.abi.json"),
+            result = processing.processMessage(CommonUtils.abiFromResource("/Wallet.abi.json"),
                     giveAddress, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
                     10, false, System.out::println);
         }
@@ -184,7 +183,7 @@ public class ApiBase {
                     new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
                     giveJsonObject.toString()
             );
-            result = processing.processMessage(CommonUtils.abiFromResource("/Wallet_5a33.abi.json"),
+            result = processing.processMessage(CommonUtils.abiFromResource("/Wallet.abi.json"),
                     giveAddress, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
                     10, false, System.out::println);
         }
@@ -219,7 +218,7 @@ public class ApiBase {
                         new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
                         giveJsonObject.toString()
                 );
-                result = processing.processMessage(CommonUtils.abiFromResource("/Wallet_5a33.abi.json"),
+                result = processing.processMessage(CommonUtils.abiFromResource("/Wallet.abi.json"),
                         from, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
                         10, false, System.out::println);
             }
@@ -358,7 +357,8 @@ public class ApiBase {
         if (runRes==null)
             return null;
         JSONObject output = runRes.getJSONObject("decoded").getJSONObject("output");
-        AccountInfo res = new AccountInfo();;
+        AccountInfo res = new AccountInfo();
+        res.setAccount(accountAddress);
         res.setAccountDID(output.getString("value0"));
         res.setAccountName(output.getString("value1"));
         int value2 = output.getInt("value2");
@@ -418,21 +418,17 @@ public class ApiBase {
             JSONObject nftInfo = getInfo(nftAddress);
             String owner = nftInfo.getString("owner");
             JSONObject res = runGet(nftAddress, "getApproved", null, nftAbi, null);
-            if(!sender.equals(owner) ||
-                    (res != null && !sender.equals(res.getJSONObject("decoded").getJSONObject("output").getString("value0")))
-            )
-                return DDCResponse.error("调用者不是DDC拥有者或DDC授权者");
-
-            String accountAddress = getAccountAddress(owner);
-            if(accountAddress == null)
-                return DDCResponse.error("DDC拥有者账户不存在");
-            JSONObject input = new JSONObject();
-            input.put("operator", sender);
-            JSONObject runRes = runGet(accountAddress,"isApprovedForAll",input,accountAbi,null);
-            JSONObject output = runRes.getJSONObject("decoded").getJSONObject("output");
-            if(output==null || !output.getBoolean("value0"))
-                return DDCResponse.error("调用者不是DDC 拥有者账户授权者");
-
+            if(!sender.equals(owner) && (res != null && !sender.equals(res.getJSONObject("decoded").getJSONObject("output").getString("value0")))) {
+                String accountAddress = getAccountAddress(owner);
+                if(accountAddress == null)
+                    return DDCResponse.error("DDC拥有者账户不存在");
+                JSONObject input = new JSONObject();
+                input.put("operator", sender);
+                JSONObject runRes = runGet(accountAddress,"isApprovedForAll",input,accountAbi,null);
+                JSONObject output = runRes.getJSONObject("decoded").getJSONObject("output");
+                if(output==null || !output.getBoolean("value0"))
+                    return DDCResponse.error("调用者不是DDC拥有者或DDC授权者或拥有者账户授权者");
+            }
         }
         JSONObject runRes2 = runGet(senderAcc,"getAccountInfo",null,accountAbi,null);
         if (runRes2==null)
@@ -467,6 +463,9 @@ public class ApiBase {
         try {
             JSONObject tranJs = JSONObject.fromObject(transactions.toString());
             System.out.println("tranJs:"+tranJs);
+            tranJs = searchOutMesById(tranJs.getString("id"));
+            if (tranJs==null)
+                return DDCResponse.error("没有event事件 -- tran null");
             if (!tranJs.has("out_messages"))
                 return DDCResponse.error("没有event事件");
             JSONArray outMsgs = tranJs.getJSONArray("out_messages");
@@ -499,6 +498,13 @@ public class ApiBase {
         CompletableFuture<Abi.DecodedMessageBody> msgRes = abiModule.decodeMessage(abi, boc, true);
         msgRes.join();
         return msgRes;
+    }
+
+    private JSONObject searchOutMesById (String id) throws Exception {
+        Object[] o = (Object[])net.queryCollection("transactions",
+                String.format("{\"id\":{\"eq\":\"%s\"}}", id),
+                "id out_messages{id,boc,msg_type,msg_type_name} now", null, null).get();
+        return o.length > 0 ? JSONObject.fromObject(o[0]):null;
     }
 
     protected Integer getFunctionIds(String functionName) {
