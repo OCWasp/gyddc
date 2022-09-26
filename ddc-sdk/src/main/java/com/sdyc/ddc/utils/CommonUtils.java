@@ -1,12 +1,10 @@
 package com.sdyc.ddc.utils;
 
 import com.radiance.tonclient.Abi;
-import com.sdyc.ddc.bean.DDCResponse;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-import java.nio.file.*;
 import java.util.Base64;
 import java.util.Random;
 import java.util.Scanner;
@@ -24,8 +22,7 @@ public class CommonUtils {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static String tvcFromResource(String name) throws IOException, URISyntaxException {
-//        return new String(Base64.getEncoder().encode(Files.readAllBytes(Paths.get(CommonUtils.class.getResource(name).toURI()))));
+    public static String tvcFromResource(String name) throws IOException {
         return new String(Base64.getEncoder().encode(toByteArray(CommonUtils.class.getResourceAsStream(name))));
     }
 

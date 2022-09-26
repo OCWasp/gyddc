@@ -73,7 +73,7 @@ public class NFTApi extends ApiBase{
 
             //查询mint业务费
             AccountApi accountApi = AccountApi.getInstance();
-            DDCResponse payRes = accountApi.checkFee(operator, keyPair,collection,queryFee(collection,mintNftSig), mintNftSig,0 );
+            DDCResponse payRes = accountApi.checkFee(operator, collection,queryFee(collection,mintNftSig));
             if(!payRes.isSuccess())
                 return payRes;
 

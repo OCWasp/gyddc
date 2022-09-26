@@ -17,7 +17,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 public class AccountApi extends ApiBase {
     protected static AccountApi accountApi;
@@ -31,8 +30,7 @@ public class AccountApi extends ApiBase {
         return accountApi;
     }
 
-    public DDCResponse addAccountByPlatform (String sender, String account, String accountName, String accountDID,
-                                             Crypto.KeyPair keyPair) {
+    public DDCResponse addAccountByPlatform (String sender, String account, String accountName, String accountDID, Crypto.KeyPair keyPair) {
         String senderAccAds = getAccountAddress(sender);
         DDCResponse checkAdsRes = checkAds2(sender, senderAccAds, "调用者");
         if(!checkAdsRes.isSuccess())
@@ -496,7 +494,7 @@ public class AccountApi extends ApiBase {
         return DDCResponse.success();
     }
 
-    public DDCResponse checkFee(String sender, Crypto.KeyPair keyPair, String collectionAds, BigInteger amount, int sig, int ddcId) {
+    public DDCResponse checkFee(String sender, String collectionAds, BigInteger amount) {
         if(!checkAds1(collectionAds, "接收者业务费").isSuccess())
             return checkAds1(collectionAds, "接收者业务费");
 
@@ -506,29 +504,6 @@ public class AccountApi extends ApiBase {
         if (balance.compareTo(amount) == -1 )
             return DDCResponse.error("业务费不足");
         return DDCResponse.success();
-    }
-
-    public DDCResponse safeMultisigWallet(String ownerAds, Crypto.KeyPair keyPair) throws Exception {
-        // 随机生产秘钥
-        Crypto.KeyPair keys = KeyGenerator.getKey();
-
-        Abi.ABI abi = CommonUtils.abiFromResource("/Wallet.abi.json");
-        Abi.DeploySet deploySet = new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc"));
-        JSONObject input = new JSONObject();
-        input.put("ownerPubkey", "0x" + keys.getPublic());
-        // 构造参数
-        Abi.CallSet callSet = new Abi.CallSet("constructor", null, input);
-
-        Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(abi,null, deploySet, callSet, new Abi.Signer.Keys(keys),null).get();
-        String deployAddress = message.getAddress();
-
-        if(!sendTransaction(ownerAds, deployAddress,gas10+gasBase, keyPair, false))
-            return DDCResponse.error("支付gas失败");
-        processing.sendMessage(message.getMessage(), abi, true,event -> {}).get();
-        JSONObject result = new JSONObject();
-        result.put("address", deployAddress);
-        result.put("keys", keys);
-        return DDCResponse.success(result);
     }
 
     public DDCResponse wallet(String sender, Crypto.KeyPair keyPair) {
@@ -542,30 +517,146 @@ public class AccountApi extends ApiBase {
             if(!checkAdsRes.isSuccess())
                 return checkAdsRes;
 
-            Abi.ABI abi = CommonUtils.abiFromResource("/Wallet.abi.json");
-            Abi.DeploySet deploySet = new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc"));
-            // 构造参数
             JSONObject json = new JSONObject();
             json.put("ownerPubkey", "0x" + keys.getPublic());
-            json.put("codeIndex", PropertiesReader.config.getString("codeIndex"));
+//            json.put("codeIndex", PropertiesReader.config.getString("codeIndex"));
             Abi.CallSet callSet = new Abi.CallSet("constructor", null, json);
 
-            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(abi,null, deploySet, callSet, new Abi.Signer.Keys(keys),null).get();
+            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(walletAbi,null,
+                    new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc")), callSet,
+                    new Abi.Signer.Keys(keys),null).get();
             String deployAddress = message.getAddress();
 
             JSONObject input = new JSONObject();
             input.put("publickey", "0x" + keys.getPublic());
-            Random random = new Random();
             Processing.ResultOfProcessMessage callRes =
-                    callInternalFun(sender,keyPair,gas12+gasBase,
-                            depolyWallet,
-                            "wallet",input,
-                            null,CommonUtils.abiFromResource("/DepolyWallet.abi.json"), 1);
+                    callInternalFun(sender,keyPair,gas12+gasBase, depolyWallet,"wallet",input,null, deployWalletAbi, 1);
+            System.out.println("callRes-->" + JSONObject.fromObject(callRes).toString());
 
             JSONObject result = new JSONObject();
             result.put("address", deployAddress);
             result.put("keys", keys);
 
+            return DDCResponse.success(result);
+        } catch (Exception e){
+            e.printStackTrace();
+            return DDCResponse.error("运行异常: " + e);
+        }
+    }
+
+    public DDCResponse getWallet() {
+        // 随机生产秘钥
+        Crypto.KeyPair keys = KeyGenerator.getKey();
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("ownerPubkey", "0x" + keys.getPublic());
+            json.put("codeIndex", PropertiesReader.config.getString("codeIndex"));
+            Abi.CallSet callSet = new Abi.CallSet("constructor", null, json);
+
+            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(walletAbi,null,
+                    new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc")), callSet,
+                    new Abi.Signer.Keys(keys),null).get();
+            String deployAddress = message.getAddress();
+            System.out.println("deployAddress-->" + deployAddress);
+
+            JSONObject result = new JSONObject();
+            result.put("address", deployAddress);
+            result.put("keys", keys);
+
+            return DDCResponse.success(result);
+        } catch (Exception e){
+            e.printStackTrace();
+            return DDCResponse.error("运行异常: " + e);
+        }
+    }
+
+    public DDCResponse deployWallet(String sender, String publicKey, Crypto.KeyPair keyPair) {
+        try {
+            String senderAccAds = getAccountAddress(sender);
+            DDCResponse checkAdsRes = checkAds2(sender, senderAccAds, "调用者");
+            if(!checkAdsRes.isSuccess())
+                return checkAdsRes;
+
+            JSONObject input = new JSONObject();
+            input.put("publickey", "0x" + publicKey);
+            Processing.ResultOfProcessMessage callRes =
+                    callInternalFun(sender,keyPair,gas12+gasBase, depolyWallet,"wallet",input,null, deployWalletAbi, 1);
+            return callRes == null ? DDCResponse.error("调用合约失败") : DDCResponse.success(JSONObject.fromObject(callRes).getJSONObject("transaction").getString("id"));
+        } catch (Exception e){
+            e.printStackTrace();
+            return DDCResponse.error("运行异常: " + e);
+        }
+    }
+
+    public DDCResponse safeMultisigWallet(String ownerAds, Crypto.KeyPair keyPair) {
+        try {
+            // 随机生产秘钥
+            Crypto.KeyPair keys = KeyGenerator.getKey();
+
+            JSONObject input = new JSONObject();
+            input.put("ownerPubkey", "0x" + keys.getPublic());
+
+            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(walletAbi,null,
+                    new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc")),
+                    new Abi.CallSet("constructor", null, input),
+                    new Abi.Signer.Keys(keys),null).get();
+            String deployAddress = message.getAddress();
+
+            if(!sendTransaction(ownerAds, deployAddress,gas10+gasBase, keyPair, false))
+                return DDCResponse.error("支付gas失败");
+            processing.sendMessage(message.getMessage(), walletAbi, true,event -> {}).get();
+            JSONObject result = new JSONObject();
+            result.put("address", deployAddress);
+            result.put("keys", keys);
+            return DDCResponse.success(result);
+        } catch (Exception e){
+            e.printStackTrace();
+            return DDCResponse.error("运行异常: " + e);
+        }
+    }
+
+    public DDCResponse getSafeMultisigWallet() {
+        try {
+            // 随机生产秘钥
+            Crypto.KeyPair keys = KeyGenerator.getKey();
+
+            JSONObject input = new JSONObject();
+            input.put("ownerPubkey", "0x" + keys.getPublic());
+
+            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(walletAbi,null,
+                    new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc")),
+                    new Abi.CallSet("constructor", null, input),
+                    new Abi.Signer.Keys(keys),null).get();
+            String deployAddress = message.getAddress();
+
+            JSONObject result = new JSONObject();
+            result.put("address", deployAddress);
+            result.put("keys", keys);
+            return DDCResponse.success(result);
+        } catch (Exception e){
+            e.printStackTrace();
+            return DDCResponse.error("运行异常: " + e);
+        }
+    }
+
+    public DDCResponse deploySafeMultisigWallet(String ownerAds, Crypto.KeyPair deployKeyPair, Crypto.KeyPair keyPair) {
+        try {
+            JSONObject input = new JSONObject();
+            input.put("ownerPubkey", "0x" + deployKeyPair.getPublic());
+
+            Abi.ResultOfEncodeMessage message = abiModule.encodeMessage(walletAbi,null,
+                    new Abi.DeploySet(CommonUtils.tvcFromResource("/Wallet.tvc")),
+                    new Abi.CallSet("constructor", null, input),
+                    new Abi.Signer.Keys(deployKeyPair),null).get();
+            String deployAddress = message.getAddress();
+
+            if(!sendTransaction(ownerAds, deployAddress,gas10+gasBase, keyPair, false))
+                return DDCResponse.error("支付gas失败");
+            processing.sendMessage(message.getMessage(), walletAbi, true,event -> {}).get();
+            JSONObject result = new JSONObject();
+            result.put("address", deployAddress);
+            result.put("keys", deployKeyPair);
             return DDCResponse.success(result);
         } catch (Exception e){
             e.printStackTrace();

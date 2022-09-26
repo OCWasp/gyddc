@@ -31,6 +31,9 @@ public class ApiBase {
     public static Abi.ABI authorityAbi = CommonUtils.abiFromResource("/Authority.abi.json");
     protected static Abi.ABI accountAbi = CommonUtils.abiFromResource("/Account.abi.json");
     protected static Abi.ABI nftAbi = CommonUtils.abiFromResource("/Nft.abi.json");
+    protected static Abi.ABI deployWalletAbi = CommonUtils.abiFromResource("/DepolyWallet.abi.json");
+    protected static Abi.ABI walletAbi = CommonUtils.abiFromResource("/Wallet.abi.json");
+
     // gas
     protected static String gas01 = PropertiesReader.config.getString("gas0_1");
     protected static String gas02 = PropertiesReader.config.getString("gas0_2");
@@ -85,6 +88,8 @@ public class ApiBase {
     protected Processing.ResultOfProcessMessage callInternalFun(String giveAddress, Crypto.KeyPair giveKeyPair, String value,
                                                                                 String targetAddress, String targetFunctionName, JSONObject targetInputObject,
                                                                                 Crypto.KeyPair targetKeyPair, Abi.ABI targetAbi, int flag) throws Exception{
+        if(!checkTransaction(giveAddress, targetAddress))
+            return null;
         Long time = System.currentTimeMillis();
         // 目标合约消息
         Abi.ResultOfEncodeMessageBody targetMessage = abiModule.encodeMessageBody(
@@ -107,8 +112,8 @@ public class ApiBase {
         giveJsonObject.put("flags", flag);
         CompletableFuture<Processing.ResultOfProcessMessage> result = null;
 
-//        if(bsnOperator.equals(giveAddress)){
-        if(true){
+        if(bsnOperator.equals(giveAddress)){
+//        if(true){
             giveJsonObject.put("payload", targetMessage.getBody());
 
             Abi.CallSet callSet = new Abi.CallSet(
@@ -126,7 +131,7 @@ public class ApiBase {
                     new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
                     giveJsonObject.toString()
             );
-            result = processing.processMessage(CommonUtils.abiFromResource("/Wallet.abi.json"),
+            result = processing.processMessage(walletAbi,
                     giveAddress, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
                     10, false, System.out::println);
         }
@@ -137,71 +142,18 @@ public class ApiBase {
         return result.get();
     }
 
-    public void callInternalFun2(String giveAddress, Crypto.KeyPair giveKeyPair, String value,
-                                 String targetAddress, String targetFunctionName, JSONObject targetInputObject,
-                                 Crypto.KeyPair targetKeyPair, Abi.ABI targetAbi, int flag) throws Exception {
-
-        System.out.println("cccccc");
-        Long time = System.currentTimeMillis();
-        // 目标合约消息
-        Abi.ResultOfEncodeMessageBody targetMessage = abiModule.encodeMessageBody(
-                targetAbi,
-                new Abi.CallSet(
-                        targetFunctionName,
-                        new Abi.FunctionHeader(null, null, targetKeyPair == null ? null : targetKeyPair.getPublic()),
-                        targetInputObject==null ? new JSONObject() : targetInputObject.toString()
-                ),
-                true,
-                targetKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(targetKeyPair),
-                null
-        ).get();
-
-        // give 合约转账
-        JSONObject giveJsonObject = new JSONObject();
-        giveJsonObject.put("dest", targetAddress);
-        giveJsonObject.put("value", value);
-        giveJsonObject.put("bounce", false);
-        giveJsonObject.put("flags", flag);
-        CompletableFuture<Processing.ResultOfProcessMessage> result = null;
-        System.out.println("sendTransaction-1");
-        // 目标合约消息
-//        if(bsnOperator.equals(giveAddress)){
-        if(true){
-            giveJsonObject.put("payload", targetMessage.getBody());
-            Abi.CallSet callSet = new Abi.CallSet(
-                    "sendTransaction",
-                    new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
-                    giveJsonObject.toString()
-            );
-            result = processing.processMessage(CommonUtils.abiFromResource("/SafeMultisigWallet.abi.json"),
-                    giveAddress, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
-                    10, false, System.out::println);
-        }else{
-            giveJsonObject.put("body", targetMessage.getBody());
-            Abi.CallSet callSet = new Abi.CallSet(
-                    "transfer",
-                    new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
-                    giveJsonObject.toString()
-            );
-            result = processing.processMessage(CommonUtils.abiFromResource("/Wallet.abi.json"),
-                    giveAddress, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
-                    10, false, System.out::println);
-        }
-        System.out.println("sendTransaction result 1:"+time + result);
-        result.join();
-        System.out.println("sendTransaction result 2:"+time + result);
-    }
-
     protected boolean sendTransaction(String from, String to, String value, Crypto.KeyPair giveKeyPair, boolean bounce){
         try {
+            if(!checkTransaction(from, to))
+                return false;
             JSONObject giveJsonObject = new JSONObject();
             giveJsonObject.put("dest", to);
             giveJsonObject.put("value", value);
             giveJsonObject.put("bounce", bounce);
             giveJsonObject.put("flags", 1);
             CompletableFuture<Processing.ResultOfProcessMessage> result;
-//            if(bsnOperator.equals(from)){
-            if(true){
+            if(bsnOperator.equals(from)){
+//            if(true){
                 giveJsonObject.put("payload", "");
                 Abi.CallSet callSet = new Abi.CallSet(
                         "sendTransaction",
@@ -218,7 +170,7 @@ public class ApiBase {
                         new Abi.FunctionHeader(null, null, giveKeyPair == null ? null : giveKeyPair.getPublic()),
                         giveJsonObject.toString()
                 );
-                result = processing.processMessage(CommonUtils.abiFromResource("/Wallet.abi.json"),
+                result = processing.processMessage(walletAbi,
                         from, null, callSet, giveKeyPair == null ? Abi.Signer.None : new Abi.Signer.Keys(giveKeyPair),
                         10, false, System.out::println);
             }
@@ -339,10 +291,14 @@ public class ApiBase {
         if(account == null){
             return false;
         }
-        JSONObject input = new JSONObject();
-        input.put("role", role);
-        JSONObject runRes = runGet(account,"checkAvailableAndRole",input,accountAbi,null);
-        return runRes == null ? false : runRes.getJSONObject("decoded").getJSONObject("output").getBoolean("value0");
+        try {
+            JSONObject input = new JSONObject();
+            input.put("role", role);
+            JSONObject runRes = runGet(account,"checkAvailableAndRole",input,accountAbi,null);
+            return runRes == null ? false : runRes.getJSONObject("decoded").getJSONObject("output").getBoolean("value0");
+        }catch (Exception e){
+            return false;
+        }
     }
 
     public AccountInfo getAccount(String account) {
@@ -532,4 +488,13 @@ public class ApiBase {
             context.destroy();
     }
 
+    /**
+     * 平台方不能给平台方转账
+     * @param from
+     * @param to
+     * @return
+     */
+    private boolean checkTransaction(String from, String to) {
+        return !(checkAvailableAndRole(getAccountAddress(from),1) && checkAvailableAndRole(getAccountAddress(to),1));
+    }
 }
