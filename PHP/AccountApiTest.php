@@ -60,10 +60,17 @@
 
     // 删除业务账号
     // echo $AccountApi->delAccount($opAddress, $opKeyPair, true, $coAddress);
-
-    // 创建链账号
-    // echo $AccountApi-> wallet($opAddress, $opKeyPair);
     
+    // 创建链账号
+    // echo $AccountApi-> safeMultisigWallet($opAddress, $opKeyPair);
+
+    // 离线生成链账号
+    // echo $AccountApi-> getSafeMultisigWallet();
+
+    // 部署链账号
+    // $deployKeyPair = new Java('com.radiance.tonclient.Crypto$KeyPair', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    // echo $AccountApi-> deploySafeMultisigWallet($opAddress, $deployKeyPair, $opKeyPair);
+
     // 转账白名单
     // echo $AccountApi-> setTransable($opAddress, $plAddress, true, $opKeyPair);
 ?> 
